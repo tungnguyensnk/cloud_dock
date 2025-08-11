@@ -4,6 +4,13 @@ A modern, secure file storage and sharing application built with Next.js and Goo
 clean, intuitive interface for uploading, managing, and sharing files through Google Drive with optional password
 protection.
 
+## 🌐 Live Demo
+
+**[Try Cloud Dock Live](https://clouddock.kizunasoft.com/)**
+
+Experience the full functionality of Cloud Dock with our hosted demo. Upload, manage, and share files seamlessly through
+our live instance.
+
 ## ✨ Features
 
 - **File Upload & Download**: Seamlessly upload files to Google Drive and download them with a single click
