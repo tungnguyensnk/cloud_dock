@@ -5,7 +5,7 @@ import PasswordProtection from '../components/PasswordProtection';
 import { useAuth } from '../lib/authContext';
 
 export default function Home() {
-  const {password, passwordRequired} = useAuth();
+  const {password, passwordRequired, isLoading} = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [files, setFiles] = useState([]);
@@ -13,16 +13,34 @@ export default function Home() {
   const [toast, setToast] = useState({show: false, message: '', type: ''});
   const [autoDeleteInfo, setAutoDeleteInfo] = useState(null);
 
-  // load files on component mount
+  // load files when auth context is ready
   useEffect(() => {
-    loadFiles();
-    loadAutoDeleteInfo();
-  }, []);
+    // wait for auth context to finish loading
+    if (isLoading) return;
+
+    // only load files if password is not required or if we have password
+    if (!passwordRequired || (passwordRequired && password)) {
+      loadFiles();
+      loadAutoDeleteInfo();
+    }
+  }, [password, passwordRequired, isLoading]);
 
   const loadFiles = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/files');
+      // build URL with password if required
+      let url = '/api/files';
+      const params = new URLSearchParams();
+
+      if (passwordRequired && password) {
+        params.append('password', password);
+      }
+
+      if (params.toString()) {
+        url += '?' + params.toString();
+      }
+
+      const response = await fetch(url);
       const data = await response.json();
       if (data.success) {
         setFiles(data.data);
@@ -31,7 +49,8 @@ export default function Home() {
         if (data.needsSetup) {
           showToast('Google Drive API not configured. Please setup credentials first.', 'error');
         } else {
-          showToast('Failed to load files: ' + data.error, 'error');
+          const errorMessage = data.error || data.message || 'Unknown error';
+          showToast('Failed to load files: ' + errorMessage, 'error');
         }
         setFiles([]);
       }
@@ -199,6 +218,9 @@ export default function Home() {
           <div className="nav-links">
             <Link href="/setup" className="setup-link">
               🔧 Setup Google Drive API
+            </Link>
+            <Link href="/guide" className="setup-link" style={{marginLeft: '15px'}}>
+              📖 User Guide & API
             </Link>
           </div>
         </div>
