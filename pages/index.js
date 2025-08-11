@@ -244,7 +244,6 @@ export default function Home() {
                 <tr>
                   <th>File Name</th>
                   <th>Size</th>
-                  <th>Type</th>
                   <th>Created Date</th>
                   <th>Actions</th>
                 </tr>
@@ -254,9 +253,8 @@ export default function Home() {
                   <tr key={file.id}>
                     <td>{file.name}</td>
                     <td>{formatFileSize(file.size)}</td>
-                    <td>{file.mimeType}</td>
                     <td>{formatDate(file.createdTime)}</td>
-                    <td>
+                    <td className="actions-cell">
                       <button
                         className="download-btn"
                         onClick={() => handleDownload(file.id, file.name)}
@@ -496,6 +494,10 @@ export default function Home() {
               border-bottom: 1px solid #dee2e6;
           }
 
+          .actions-cell {
+              white-space: nowrap;
+          }
+
           .files-table tr:hover {
               background: #f8f9fa;
           }
@@ -526,7 +528,7 @@ export default function Home() {
               cursor: pointer;
               font-size: 0.9rem;
               transition: all 0.3s ease;
-              margin-left: 8px;
+              margin: 0 4px;
           }
 
           .copy-btn:hover {
@@ -543,7 +545,7 @@ export default function Home() {
               cursor: pointer;
               font-size: 0.9rem;
               transition: all 0.3s ease;
-              margin-left: 8px;
+              margin: 0 4px;
           }
 
           .delete-btn:hover {
