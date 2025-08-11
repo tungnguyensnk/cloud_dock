@@ -1,38 +1,17 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '../lib/authContext';
 
 export default function PasswordProtection({children}) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const {isAuthenticated, passwordRequired, login} = useAuth();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  const [passwordRequired, setPasswordRequired] = useState(false);
 
   useEffect(() => {
-    // check if password is required
-    checkPasswordRequired();
-
-    // check if already authenticated
-    const savedAuth = localStorage.getItem('cloud_dock_auth');
-    if (savedAuth === 'true') {
-      setIsAuthenticated(true);
-    }
     setLoading(false);
   }, []);
 
-  const checkPasswordRequired = async () => {
-    try {
-      const response = await fetch('/api/check-password');
-      const data = await response.json();
-      setPasswordRequired(data.required);
-      if (!data.required) {
-        setIsAuthenticated(true);
-      }
-    } catch (error) {
-      console.error('Error checking password requirement:', error);
-      setPasswordRequired(false);
-      setIsAuthenticated(true);
-    }
-  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,8 +29,7 @@ export default function PasswordProtection({children}) {
       const data = await response.json();
 
       if (data.success) {
-        localStorage.setItem('cloud_dock_auth', 'true');
-        setIsAuthenticated(true);
+        login(password);
       } else {
         setError('Incorrect password');
       }

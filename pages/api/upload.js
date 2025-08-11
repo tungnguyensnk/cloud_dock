@@ -32,6 +32,18 @@ export default async function handler(req, res) {
     // run multer middleware
     await runMiddleware(req, res, upload.single('file'));
 
+    // check password authentication if PASSWORD is set in env
+    const requiredPassword = process.env.PASSWORD;
+    if (requiredPassword) {
+      const password = req.body.password;
+      if (!password || password !== requiredPassword) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+    }
+
     if (!req.file) {
       return res.status(400).json({
         success: false,

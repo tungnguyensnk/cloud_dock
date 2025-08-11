@@ -5,6 +5,18 @@ export default async function handler(req, res) {
     return res.status(405).json({message: 'Method not allowed'});
   }
 
+  // check password authentication if PASSWORD is set in env
+  const requiredPassword = process.env.PASSWORD;
+  if (requiredPassword) {
+    const {password} = req.body;
+    if (!password || password !== requiredPassword) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+    }
+  }
+
   try {
     const {fileId} = req.body;
 

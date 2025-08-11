@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import PasswordProtection from '../components/PasswordProtection';
+import { useAuth } from '../lib/authContext';
 
 export default function Home() {
+  const {password, passwordRequired} = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [files, setFiles] = useState([]);
@@ -75,6 +77,11 @@ export default function Home() {
     const formData = new FormData();
     formData.append('file', selectedFile);
 
+    // add password if required
+    if (passwordRequired && password) {
+      formData.append('password', password);
+    }
+
     try {
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -133,12 +140,19 @@ export default function Home() {
     }
 
     try {
+      const requestBody = {fileId};
+
+      // add password if required
+      if (passwordRequired && password) {
+        requestBody.password = password;
+      }
+      
       const response = await fetch('/api/delete', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({fileId})
+        body: JSON.stringify(requestBody)
       });
 
       const data = await response.json();
